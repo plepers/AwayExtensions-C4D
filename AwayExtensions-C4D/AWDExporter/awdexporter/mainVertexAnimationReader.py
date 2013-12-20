@@ -24,6 +24,8 @@ def getVertexAnimationData(objList,exportData,mainDialog,newAWDBlockAnimSetorigi
             if exporterSettingsTag[1014]==False and exporterSettingsTag[1016]== False:
                 exportThisObj=False
                 exportThisObjChild=True
+
+        print "getVertexAnimationData "+str(object.GetName())+" export: "+str(exportThisObj)
         if exportThisObj==True: 
             tag=object.GetTag(1030508)
             if tag is not None:
@@ -39,19 +41,26 @@ def getVertexAnimationData(objList,exportData,mainDialog,newAWDBlockAnimSetorigi
                         exportData.allAWDBlocks[int(tag.GetName())].blockType=113
                         exportData.allAWDBlocks[int(tag.GetName())].tagForExport=True
             if tag is None:
+                print "getVertexAnimationData A"
                 alltags=object.GetTags()
                 for animTag in alltags:
+                    print "getVertexAnimationData B"+str( animTag.GetType() )
                     if animTag.GetType()==1030484:
+                        print "getVertexAnimationData C"
                         vertexAnimationTag=animTag            
-                        if vertexAnimationTag is not None:                      
-                            if vertexAnimationTag[1010]==True:                     
-                                if vertexAnimationTag[1011] is not None:       
+                        if vertexAnimationTag is not None:   
+                            print "getVertexAnimationData D"                   
+                            if vertexAnimationTag[1010]==True: 
+                                print "getVertexAnimationData E"                     
+                                if vertexAnimationTag[1011] is not None: 
+                                    print "getVertexAnimationData F"       
                                     if vertexAnimationTag[1050] is None: 
                                         print "ERROR = No Animation-Target Set"
                                     if vertexAnimationTag[1050] is not None: 
                                         if str(vertexAnimationTag[1050].GetName())==str(object.GetName()):
                                             print "ERROR = Animation Data must not target itself"
                                         if str(vertexAnimationTag[1050].GetName())!=str(object.GetName()):
+                                            print "will buildVertexAnimation"
                                             anim=buildVertexAnimation(exportData,object,mainDialog,vertexAnimationTag) 
                                             if exportData.debug==True:
                                                 print "Animationset = "+str(newAWDBlockAnimSet)
@@ -74,9 +83,7 @@ def buildVertexAnimation(exportData,curObj,mainDialog,vertexAnimationTag):
     if animationRange!=1021:                                                        # if it is not set to "Global" we update the minframe/maxFrame using the skeletonAnmiationTags input values
         minFrame=vertexAnimationTag[1018]
         maxFrame=vertexAnimationTag[1020]
-        
-    #print "Start Exporting Animation Range = "+str(minFrame)+"  -  "+str(maxFrame)
-    
+    print "Start Exporting Animation Range = "+str(minFrame)+"  -  "+str(maxFrame)
     keyFrameStyle=vertexAnimationTag[1054]   
     curFrame=minFrame                                                                                           # set the first frame to be the current frame
     frameDurations=[]                                                                                             # list to store all frame-durations
@@ -187,6 +194,10 @@ def buildMeshPoseAnimationBlock(exportData,curObj,durationList,positionList,vert
     newAWDBlock.targetMesh=int(vertexAnimationTag[1050].GetName())
     newAWDBlock.frameDurations=durationList
     newAWDBlock.framePoints=positionList
+    print "   target :"+str(int(vertexAnimationTag[1050].GetName()))
+    print "   should have poseAnimationBlocks"
+    print "   the block "+str(exportData.allAWDBlocks[int(vertexAnimationTag[1050].GetName())])
+    print "   the data "+str(exportData.allAWDBlocks[int(vertexAnimationTag[1050].GetName())].data)
     exportData.allAWDBlocks[int(vertexAnimationTag[1050].GetName())].data.poseAnimationBlocks.append(newAWDBlock)
     exportData.allVertexAnimations.append(newAWDBlock)
     if vertexAnimationTag[1053]!=True:
@@ -206,6 +217,7 @@ def buildMeshPoseBlock(exportData,curObj,durationList,positionList,vertexAnimati
     newAWDBlock.targetMesh=int(vertexAnimationTag[1050].GetName())
     newAWDBlock.duration=durationList[0]
     newAWDBlock.points=positionList[0]
+    print "   add meshPosBlock to "+str(int(vertexAnimationTag.GetName()))
     exportData.allAWDBlocks[int(vertexAnimationTag.GetName())].data=newAWDBlock
     exportData.allAWDBlocks[int(vertexAnimationTag.GetName())].blockType=111
     exportData.allAWDBlocks[int(vertexAnimationTag.GetName())].tagForExport=True

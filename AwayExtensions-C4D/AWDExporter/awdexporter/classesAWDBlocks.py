@@ -41,6 +41,7 @@ class WrapperBlock(object):# baseclass for sceneObjects - not to be instanced di
         self.tagForExport=False
         self.isReordered=False
         self.saveBlockID=0
+        print "create WrapperBlock name: "+name+" with target :"+str(targetObject)
         
         self.data=None
 
@@ -95,6 +96,8 @@ class TriangleGeometrieBlock(BaseBlock):
         self.saveGeometryProps = []
         self.saveSubMeshes = []
         self.saveUserAttributes = []
+
+        print "create TriangleGeometrieBlock id: "+str(blockID)
 
     def writeBinary(self,exportData):
         baseBlockBytes=super(TriangleGeometrieBlock, self).writeBinary(exportData)
@@ -202,6 +205,8 @@ class MeshInstanceBlock(BaseSceneContainerBlock):
         self.usedSkeleton=None
         self.poseAnimationBlocks=[]
         self.isRenderInstance=False#if this is true, the meshInstance in c4d is a instanceObject set to be a renderInstance e.g. uses same displaymaterials as reference
+        print "create MeshInstanceBlock id: "+str(blockID)
+
     def writeBinary(self,exportData):
         baseBlockBytes,sceneBlockBytes=super(MeshInstanceBlock, self).writeBinary(exportData)
         sceneBlockBytes+=struct.pack("< I",self.saveGeoBlockID)
@@ -526,6 +531,7 @@ class AnimatorBlock(BaseBlock):
         animatorBlockBytes+=struct.pack("< H",self.animatorTyp)
         animatorBlockBlockAttributesBytes=str()  
         print "self.saveSkeletonID! = "+str(self.saveSkeletonID)
+        print "self.saveMeshID! = "+str(self.saveMeshID)
         if self.saveSkeletonID!=None:
             animatorBlockBlockAttributesBytes+=struct.pack("< H",1)
             animatorBlockBlockAttributesBytes+=struct.pack("< I",4)

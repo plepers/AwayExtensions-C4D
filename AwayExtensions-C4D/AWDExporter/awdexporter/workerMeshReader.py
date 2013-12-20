@@ -109,8 +109,8 @@ def convertMesh(meshBlock,exportData,workerthreat):
                 instanceMaterials.append([])
             instanceMaterials[0]= returnMat
             useInstanceSelection.append(useSelections)
-            if useSelections==True: # if the selections are used on this Instance:
-                useSelectionsComplete=True # the polygonObject must be split into the selections
+            #if useSelections==True: # if the selections are used on this Instance:
+            #    useSelectionsComplete=True # the polygonObject must be split into the selections
             allInstanceMaterials.append(instanceMaterials)
             applyToinstanceMaterials.append(instanceMaterials[0])
             if instanceCnt==0:

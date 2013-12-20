@@ -100,6 +100,8 @@ def startExport(mainDialog,doc):
     exportData.status=1                                         # used to calculate the progress-bar
     mainHelpers.updateCanvas(mainDialog,exportData)             # update the progress-bar
     mainSkeletonReader.createSkeletonBlocks(exportData.objList,exportData,mainDialog) 
+    
+    print "Will export animations ? : "+str(mainDialog.GetBool(ids.CBOX_VANIMATION))
     if mainDialog.GetBool(ids.CBOX_VANIMATION)==True:
         mainVertexAnimationReader.getVertexAnimationData(exportData.objList,exportData,mainDialog)
     exportData.status=2  
