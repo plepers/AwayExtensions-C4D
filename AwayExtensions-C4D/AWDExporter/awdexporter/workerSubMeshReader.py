@@ -113,7 +113,7 @@ def cleanMaterialRestriction(meshBlock,materialList):
 
            
 #checks if a vert/normal/uv - combination allready exists in the uniquePool of the given Submesh.
-def buildSharedPoint(exportData,faceStyle,meshBlock,curMesh,curPoint,curUV,curSubMesh,pointNr,normal,normalf,anglelimit,useAngle,isEdgeBreak,animations,subMeshNr):
+def buildSharedPoint(exportData,faceStyle,meshBlock,curMesh,curPoint,curUV,curSubMesh,pointNr,normal,normalf,anglelimit,useAngle,isEdgeBreak,animations,subMeshNr,uv2):
                     
         
     checkerstring=str(curPoint)             # get the vector as string to use as "dictionary-look-up-key"
@@ -174,10 +174,10 @@ def buildSharedPoint(exportData,faceStyle,meshBlock,curMesh,curPoint,curUV,curSu
                 
     if pointIndex==-1:# and pointMorphedIndex==-1:
         meshBlock.pointsUsed[pointNr]=True   
-        buildPoint(exportData,faceStyle,meshBlock,curMesh,curSubMesh,curPoint,pointNr,curUV,normal,normalf,checkerstring2,animations,subMeshNr)
+        buildPoint(exportData,faceStyle,meshBlock,curMesh,curSubMesh,curPoint,pointNr,curUV,normal,normalf,checkerstring2,animations,subMeshNr,uv2)
 
                          
-def buildPoint(exportData,faceStyle,meshBlock,curMesh,curSubMesh,curPoint,pointNr,curUv,curNormal=None,curNormalf=None,checkerstring=None,animations=None,subMeshNr=None):
+def buildPoint(exportData,faceStyle,meshBlock,curMesh,curSubMesh,curPoint,pointNr,curUv,curNormal=None,curNormalf=None,checkerstring=None,animations=None,subMeshNr=None,uv2=None):
                      
     ismorph=False
     #morphCounter=0
@@ -229,6 +229,8 @@ def buildPoint(exportData,faceStyle,meshBlock,curMesh,curSubMesh,curPoint,pointN
         #curSubMesh.sharedvertexBuffer.append(-1) faceStyle
         if curUv is not None:
             curSubMesh.uvBuffer.append(curUv)
+        if uv2 is not None:
+            curSubMesh.uv2Buffer.append(uv2)
         if curNormal is not None:
             curSubMesh.normalBuffer.append(curNormal)
         if curNormalf is not None:
@@ -302,6 +304,7 @@ def collectSubmeshData(meshBlock,exportData,workerthreat):
     count=len(polys)                                # get the llength of the polygon-list
     count2=float(10/float(count))                   # used to calulate the status of the progress bar
     uvTag=meshBlock.sceneObject.GetTag(c4d.Tuvw)                         # get the first UV-Tag applied to the mesh
+    uvTag2=meshBlock.sceneObject.GetTag(c4d.Tuvw, 1)
     allFoundSelection=0# this will be incremeted for each polygon that was not exported correctly (should not happen)
     for faceIndex in xrange(count):                                     # iterate trough all polygons 
         if workerthreat.TestBreak():                                        # if the user cancelled the export, 
@@ -316,7 +319,15 @@ def collectSubmeshData(meshBlock,exportData,workerthreat):
             uva=uv["a"]
             uvb=uv["b"]
             uvc=uv["c"]
-            uvd=uv["d"]                
+            uvd=uv["d"]      
+
+        uva2=uvb2=uvc2=uvd2=None                                                
+        if uvTag2 is not None :   
+            uv2 = uvTag2.GetSlow(faceIndex)     # we get the UVs for the Polygon and store them in "uv"
+            uva2=uv2["a"]
+            uvb2=uv2["b"]
+            uvc2=uv2["c"]
+            uvd2=uv2["d"]                
                
         faceStyle="tri"                 # set faceStyle to "tri", than we chack if we have to set it to "quad"
         if oldpoints.c!=oldpoints.d:    # if the pointIndex of the points c and d are not the same, this could be a "quad"
@@ -387,18 +398,18 @@ def collectSubmeshData(meshBlock,exportData,workerthreat):
             if meshBlock.saveSubMeshes[subcount].selectionIndexe[faceIndex]==1:  # if the polygon is selected by this submesh, the polygon will be insterted into this submesh
                 subcount=checkForRessourceLimits(exportData,meshBlock,subcount,faceIndex,faceStyle,meshBlock.saveSubMeshes[subcount],animations) # check if this submesh has allready reached its limits. if it allready has, the index of the submesh to use instead is returned
                 if usePhong==True:    # if phongshading should be considered, execute the "buildSharedPoint()" for each of the points of the polygon
-                    buildSharedPoint(exportData,faceStyle,meshBlock,meshBlock.sceneObject,allOldPoints[oldpoints.a],uva,meshBlock.saveSubMeshes[subcount],oldpoints.a,normala,normalf,phoneAngle,usePhongAngle,isEdgeBreakA,animations,subcount)
-                    buildSharedPoint(exportData,faceStyle,meshBlock,meshBlock.sceneObject,allOldPoints[oldpoints.b],uvb,meshBlock.saveSubMeshes[subcount],oldpoints.b,normalb,normalf,phoneAngle,usePhongAngle,isEdgeBreakB,animations,subcount)
-                    buildSharedPoint(exportData,faceStyle,meshBlock,meshBlock.sceneObject,allOldPoints[oldpoints.c],uvc,meshBlock.saveSubMeshes[subcount],oldpoints.c,normalc,normalf,phoneAngle,usePhongAngle,isEdgeBreakC,animations,subcount)
+                    buildSharedPoint(exportData,faceStyle,meshBlock,meshBlock.sceneObject,allOldPoints[oldpoints.a],uva,meshBlock.saveSubMeshes[subcount],oldpoints.a,normala,normalf,phoneAngle,usePhongAngle,isEdgeBreakA,animations,subcount,uva2)
+                    buildSharedPoint(exportData,faceStyle,meshBlock,meshBlock.sceneObject,allOldPoints[oldpoints.b],uvb,meshBlock.saveSubMeshes[subcount],oldpoints.b,normalb,normalf,phoneAngle,usePhongAngle,isEdgeBreakB,animations,subcount,uvb2)
+                    buildSharedPoint(exportData,faceStyle,meshBlock,meshBlock.sceneObject,allOldPoints[oldpoints.c],uvc,meshBlock.saveSubMeshes[subcount],oldpoints.c,normalc,normalf,phoneAngle,usePhongAngle,isEdgeBreakC,animations,subcount,uvc2)
                     if str(faceStyle)=="quad":
-                        buildSharedPoint(exportData,faceStyle,meshBlock,meshBlock.sceneObject,allOldPoints[oldpoints.d],uvd,meshBlock.saveSubMeshes[subcount],oldpoints.d,normald,normalf,phoneAngle,usePhongAngle,isEdgeBreakD,animations,subcount)
+                        buildSharedPoint(exportData,faceStyle,meshBlock,meshBlock.sceneObject,allOldPoints[oldpoints.d],uvd,meshBlock.saveSubMeshes[subcount],oldpoints.d,normald,normalf,phoneAngle,usePhongAngle,isEdgeBreakD,animations,subcount, uvd2)
                 
                 if usePhong==False: # if phongshading should not be considered, execute the "buildPoint()" for each of the points of the polygon
-                    buildPoint(exportData,faceStyle,meshBlock,meshBlock.sceneObject,meshBlock.saveSubMeshes[subcount],allOldPoints[oldpoints.a],oldpoints.a,uva,None,animations,subcount)
-                    buildPoint(exportData,faceStyle,meshBlock,meshBlock.sceneObject,meshBlock.saveSubMeshes[subcount],allOldPoints[oldpoints.b],oldpoints.b,uvb,None,animations,subcount)
-                    buildPoint(exportData,faceStyle,meshBlock,meshBlock.sceneObject,meshBlock.saveSubMeshes[subcount],allOldPoints[oldpoints.c],oldpoints.c,uvc,None,animations,subcount)
+                    buildPoint(exportData,faceStyle,meshBlock,meshBlock.sceneObject,meshBlock.saveSubMeshes[subcount],allOldPoints[oldpoints.a],oldpoints.a,uva,None,animations,subcount,uva2)
+                    buildPoint(exportData,faceStyle,meshBlock,meshBlock.sceneObject,meshBlock.saveSubMeshes[subcount],allOldPoints[oldpoints.b],oldpoints.b,uvb,None,animations,subcount,uvb2)
+                    buildPoint(exportData,faceStyle,meshBlock,meshBlock.sceneObject,meshBlock.saveSubMeshes[subcount],allOldPoints[oldpoints.c],oldpoints.c,uvc,None,animations,subcount,uvc2)
                     if str(faceStyle)=="quad":
-                        buildPoint(exportData,faceStyle,meshBlock,meshBlock.sceneObject,meshBlock.saveSubMeshes[subcount],allOldPoints[oldpoints.d],oldpoints.d,uvd)
+                        buildPoint(exportData,faceStyle,meshBlock,meshBlock.sceneObject,meshBlock.saveSubMeshes[subcount],allOldPoints[oldpoints.d],oldpoints.d,uvd,None, None, None, uvd2)
                 foundSelection=True# set this to true, so we now a polygon was set to a submesh    
                 break
             subcount+=1
@@ -541,6 +552,14 @@ def buildGeometryStreams(subMesh,scale,animations, subMeshNr):
             uvData.append(uv.x)
             uvData.append(uv.y)
         subMesh.saveGeometryStreams.append(classesAWDBlocks.awdGeometryStream(3,uvData))
+
+    # create the final AWD-GeometryStream-Object for UV-Data (type=3)
+    if len(subMesh.uv2Buffer)>0:
+        uvData=[]
+        for uv in subMesh.uv2Buffer:
+            uvData.append(uv.x)
+            uvData.append(uv.y)
+        subMesh.saveGeometryStreams.append(classesAWDBlocks.awdGeometryStream(30,uvData))
         
     # prepare Weight-Data and JointIndex-Data for the final AWD.GeometryStream-Object:
     if len(subMesh.weightsBuffer)>0 and len(subMesh.jointidxBuffer)>0:

@@ -804,6 +804,10 @@ class awdGeometryStream(object):
             self.streamTypeName="UV"
             self.dataType = "f"
             self.dataType2 = 4
+        if streamType==30:#UV2
+            self.streamTypeName="UV2"
+            self.dataType = "f"
+            self.dataType2 = 4
         if streamType==4:#VertexNormals
             self.streamTypeName="VertexNormals"
             self.dataType = "f"
@@ -845,6 +849,7 @@ class awdSubMesh(object):
         self.vertexBuffer= []
         self.indexBuffer= []
         self.uvBuffer= []
+        self.uv2Buffer= []
         self.normalBuffer= []
         self.faceNormal= []
         self.quadBuffer= []
