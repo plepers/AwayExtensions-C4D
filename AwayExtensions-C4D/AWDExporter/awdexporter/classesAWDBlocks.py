@@ -790,35 +790,35 @@ class awdGeometryStream(object):
         if streamType==1:#Vertex
             self.streamTypeName="Vertex"
             self.dataType = "f"
-            self.dataType2 = 4
+            self.dataType2 = 7
         if streamType==2:#Index
             self.streamTypeName="Index"
             self.dataType = "H"
-            self.dataType2 = 2
+            self.dataType2 = 5
         if streamType==3:#UV
             self.streamTypeName="UV"
             self.dataType = "f"
-            self.dataType2 = 4
+            self.dataType2 = 7
         if streamType==4:#VertexNormals
             self.streamTypeName="VertexNormals"
             self.dataType = "f"
-            self.dataType2 = 4
+            self.dataType2 = 7
         if streamType==5:#VertexTangents
             self.streamTypeName="VertexTangents"
             self.dataType = "f"
-            self.dataType2 = 4
+            self.dataType2 = 7
         if streamType==6:#JointIndex
             self.streamTypeName="JointIndex"
             self.dataType = "H"
-            self.dataType2 = 2
+            self.dataType2 = 5
         if streamType==7:#JointWeights
             self.streamTypeName="JointWeights"
             self.dataType = "f"
-            self.dataType2 = 4
+            self.dataType2 = 7
         if streamType==8:#quads - not used by official AWD
             self.streamTypeName="quads"
             self.dataType = "H"
-            self.dataType2 = 2
+            self.dataType2 = 5
 
 class awdSubMesh(object):
     def __init__(self,materialName,selectionName,selectionIndexe, textureTag):
